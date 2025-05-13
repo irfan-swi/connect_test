@@ -8,8 +8,8 @@ library(data.table)
 # Register the font
 register_gfont("Roboto")
 
-# Load the dataset
-df <- fread("df2.csv")
+# Load the dataset from S3 bucket
+df <- fread("https://legis1-analytics.s3.us-east-1.amazonaws.com/df2.csv")
 
 # Define UI for the application
 ui <- fluidPage(
@@ -157,6 +157,15 @@ server <- function(input, output, session) {
       opts_hover(css = "cursor:pointer;fill:gray;stroke:gray;"),
       opts_selection(type = "single", css = "fill:gray;stroke:gray;")
     ))
+  })
+  
+  # Handle bar clicks
+  observeEvent(input$plot_selected, {
+    selected_id <- input$plot_selected
+    if (!is.null(selected_id) && length(selected_id) > 0) {
+      url <- paste0("https://congress-qa.sunwater.org/lawmaker/detail?id=", selected_id, "#communications")
+      session$sendCustomMessage("openURL", url)
+    }
   })
   
   # Dynamic title and subtitle
